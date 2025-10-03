@@ -59,7 +59,8 @@ export class PhotoManager {
       const atManager = abilityAccessCtrl.createAtManager();
       const permissions: Array<Permissions> = [
         'ohos.permission.CAMERA',
-        'ohos.permission.WRITE_MEDIA'
+        'ohos.permission.WRITE_MEDIA',
+        'ohos.permission.READ_MEDIA'
       ];
 
       const requestResult: PermissionRequestResult = await atManager.requestPermissionsFromUser(this.context, permissions);

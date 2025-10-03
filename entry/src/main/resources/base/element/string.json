@@ -19,6 +19,10 @@
     {
       "name": "write_media_permission_reason",
       "value": "应用需要保存拍照的学习内容"
+    },
+    {
+      "name": "read_media_permission_reason",
+      "value": "应用需要读取媒体库以展示与管理学习照片"
     }
   ]
 }
