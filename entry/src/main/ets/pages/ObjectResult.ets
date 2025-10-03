@@ -1,7 +1,6 @@
 import { StudyRecord, RecognizedObject } from '../common/RecognitionService'
 import router from '@ohos.router'
 
-@Entry
 @Component
 export default struct ObjectResult {
   @State record: StudyRecord = {
