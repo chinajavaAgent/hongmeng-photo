@@ -13,6 +13,9 @@ export default struct CameraCapture {
   private xController: XComponentController = new XComponentController();
   @State isReady: boolean = false;
   @State isCapturing: boolean = false;
+  @State zoomRatio: number = 1.0;
+  @State torchOn: boolean = false;
+  @State usingBack: boolean = true;
 
   aboutToAppear() {
     const ctx = (this.photoManager as any).context as common.UIAbilityContext; // context is set in EntryAbility
@@ -34,16 +37,9 @@ export default struct CameraCapture {
     if (!this.cam) { return; }
     try {
       this.isCapturing = true;
-      const ok = await this.cam.capture();
-      // Simulate saved uri for now
-      const filePath = `file://media/Photo/photo_${Date.now()}.jpg`;
-      // Add record and run recognition
-      this.photoManager['photoRecords'].unshift({
-        id: `photo_${Date.now()}`,
-        filePath,
-        timestamp: Date.now(),
-        thumbnail: filePath
-      });
+      const filePath = await this.cam.capture();
+      // Add record using helper and run recognition
+      this.photoManager.addRecord(filePath);
       const record: StudyRecord = await this.recognitionService.recognizeObject(filePath);
       await router.pushUrl({ url: 'pages/ObjectResult', params: { record } });
     } catch (e) {
@@ -105,15 +101,42 @@ export default struct CameraCapture {
       .width('100%')
       .margin({ top: 12 })
 
-      // Capture control
-      Button(this.isCapturing ? '拍摄中...' : '✓ 拍摄并识别', { type: ButtonType.Capsule })
+      // Controls row: zoom slider, torch toggle, capture, switch camera
+      Column() {
+        Row() {
+          // Zoom label
+          Text('Zoom')
+            .fontSize(12)
+            .fontColor('#78909C')
+          Slider({ min: 1, max: 4, value: this.zoomRatio, step: 0.1 })
+            .width('60%')
+            .onChange((v: number) => { this.zoomRatio = v; /* TODO: bind to camera */ })
+          Button(this.torchOn ? '闪光:开' : '闪光:关')
+            .type(ButtonType.Normal)
+            .onClick(() => { this.torchOn = !this.torchOn; /* TODO: bind to camera */ })
+        }
+        .width('85%')
+        .margin({ top: 16 })
+
+        Row() {
+          Button(this.isCapturing ? '拍摄中...' : '✓ 拍摄并识别', { type: ButtonType.Capsule })
+            .width('60%')
+            .height(56)
+            .fontSize(18)
+            .backgroundColor('#1698CE')
+            .enabled(this.isReady && !this.isCapturing)
+            .onClick(() => this.onCapture())
+
+          Blank()
+
+          Button(this.usingBack ? '后摄' : '前摄')
+            .type(ButtonType.Capsule)
+            .width(70)
+            .onClick(() => { /* TODO: switch camera pipeline */ this.usingBack = !this.usingBack; })
+        }
         .width('75%')
-        .height(56)
-        .fontSize(18)
-        .backgroundColor('#1698CE')
-        .enabled(this.isReady && !this.isCapturing)
-        .onClick(() => this.onCapture())
-        .margin({ top: 24 })
+        .margin({ top: 12 })
+      }
 
       Button('返回', { type: ButtonType.Capsule })
         .width('60%')
@@ -128,4 +151,3 @@ export default struct CameraCapture {
     .backgroundColor('#F8F8F8')
   }
 }
-
