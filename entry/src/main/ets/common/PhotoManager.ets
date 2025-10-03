@@ -185,6 +185,19 @@ export class PhotoManager {
     }
   }
 
+  // Public helper to add a new record by file path (used by camera capture flow)
+  public addRecord(filePath: string): PhotoRecord {
+    const rec: PhotoRecord = {
+      id: `photo_${Date.now()}`,
+      filePath,
+      timestamp: Date.now(),
+      thumbnail: filePath
+    };
+    this.photoRecords.unshift(rec);
+    this.savePhotoRecords();
+    return rec;
+  }
+
   private loadPhotoRecords(): void {
     try {
       // 在实际应用中从持久化存储加载数据

@@ -288,9 +288,9 @@ struct Index {
 
   @Builder CameraGuideSection() {
     Column() {
-      // 主拍照按钮
+      // 主拍照按钮（直拍预览页）
       Stack() {
-        Button(this.isTakingPhoto ? '启动中...' : '📸 拍照学习', { type: ButtonType.Capsule })
+        Button(this.isTakingPhoto ? '启动中...' : '📸 直拍学习', { type: ButtonType.Capsule })
           .width('75%')
           .height(56)
           .fontSize(18)
@@ -298,7 +298,7 @@ struct Index {
           .backgroundColor('#1698CE')
           .enabled(!this.isTakingPhoto)
           .onClick(() => {
-            this.onTakePhoto();
+            router.pushUrl({ url: 'pages/CameraCapture' });
           })
           .shadow({
             radius: 15,
@@ -317,7 +317,7 @@ struct Index {
       }
       .margin({ top: 30 })
 
-      // 实物识别按钮（最小闭环）
+      // 实物识别按钮（选图路径，作为兜底方案）
       Button(this.isTakingPhoto ? '请稍候...' : '🔍 实物识别', { type: ButtonType.Capsule })
         .width('75%')
         .height(48)
