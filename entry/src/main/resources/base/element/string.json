@@ -1,0 +1,24 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "PhotoLearn应用模块"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "PhotoLearn应用入口"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "拍照学英语"
+    },
+    {
+      "name": "camera_permission_reason",
+      "value": "应用需要使用相机进行拍照学习"
+    },
+    {
+      "name": "write_media_permission_reason",
+      "value": "应用需要保存拍照的学习内容"
+    }
+  ]
+}

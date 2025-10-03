@@ -1,0 +1,1 @@
+[{"time":"2025-10-03T12:23:04.023Z","category":"etsTransform","level":"warn","msg":"\u001b[33mArkTS:WARN File: /Users/mac/Desktop/photoLearn/entry/src/main/ets/pages/ObjectResult.ets:4:1\n It's not a recommended way to export struct with @Entry decorator, which may cause ACE Engine error in component preview mode.","type":"plugin_log"}]

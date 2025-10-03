@@ -1,0 +1,41 @@
+{
+  "app": {
+    "signingConfigs": [
+      {
+        "name": "default",
+        "type": "HarmonyOS",
+        "material": {
+          "certpath": "/Users/mac/.ohos/config/default_photoLearn_dGNFvRQqgAyZADXAHTLeIuc9ywsIQqdLJLxETnheYho=.cer",
+          "keyAlias": "debugKey",
+          "keyPassword": "0000001BA22612324EC6971F0921BD3756D3EE666416FCB8541B46D1272BDFA611C7A446DCA2A34352C8B1",
+          "profile": "/Users/mac/.ohos/config/default_photoLearn_dGNFvRQqgAyZADXAHTLeIuc9ywsIQqdLJLxETnheYho=.p7b",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "/Users/mac/.ohos/config/default_photoLearn_dGNFvRQqgAyZADXAHTLeIuc9ywsIQqdLJLxETnheYho=.p12",
+          "storePassword": "0000001B407E86A9CE17199951AA1FEA4CF23B07B397FD29447380EA93FBB4804482EFD69AD052C5F46054"
+        }
+      }
+    ],
+    "products": [
+      {
+        "name": "default",
+        "signingConfig": "default",
+        "compatibleSdkVersion": "5.0.0(12)",
+        "runtimeOS": "HarmonyOS"
+      }
+    ]
+  },
+  "modules": [
+    {
+      "name": "entry",
+      "srcPath": "./entry",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    }
+  ]
+}
