@@ -4,6 +4,7 @@ import { PhotoManager } from '../common/PhotoManager'
 import { CameraController } from '../common/CameraController'
 import { MockRecognitionService, RecognitionService, StudyRecord } from '../common/RecognitionService'
 
+@Entry
 @Component
 export default struct CameraCapture {
   private photoManager: PhotoManager = PhotoManager.getInstance();
