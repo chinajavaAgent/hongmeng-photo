@@ -63,6 +63,17 @@ struct Index {
         return;
       }
       const record: StudyRecord = await this.recognitionService.recognizeObject(photoPath);
+      // Attach recognition summary to latest photo record for list display
+      const main = (record.objects && record.objects.length > 0) ? record.objects[0] : undefined;
+      if (main) {
+        this.photoManager.attachRecognition(photoPath, {
+          mode: 'object',
+          labelEn: main.labelEn,
+          labelZh: main.labelZh,
+          confidence: main.confidence
+        });
+        this.loadPhotoRecords();
+      }
       await router.pushUrl({ url: 'pages/ObjectResult', params: { record } });
     } catch (e) {
       console.error('Object recognition failed:', e);
@@ -436,22 +447,48 @@ struct Index {
                 }
                 
                 Column() {
-                  Text('📸 学习照片')
-                    .fontSize(16)
-                    .fontWeight(FontWeight.Medium)
-                    .fontColor('#2C3E50')
+                  // Title: use recognized label if available
+                  if (record.labelEn) {
+                    Row() {
+                      Text(record.labelEn)
+                        .fontSize(16)
+                        .fontWeight(FontWeight.Medium)
+                        .fontColor('#2C3E50')
+                      if (record.labelZh) {
+                        Text(' · ' + record.labelZh)
+                          .fontSize(14)
+                          .fontColor('#607D8B')
+                          .margin({ left: 6 })
+                      }
+                    }
+                  } else {
+                    Text('📸 学习照片')
+                      .fontSize(16)
+                      .fontWeight(FontWeight.Medium)
+                      .fontColor('#2C3E50')
+                  }
                   Text(this.photoManager.formatTimestamp(record.timestamp))
                     .fontSize(12)
                     .fontColor('#78909C')
                     .margin({ top: 6 })
                   
                   Row() {
-                    Circle({ width: 6, height: 6 })
-                      .fill('#4CAF50')
-                    Text('已保存')
-                      .fontSize(10)
-                      .fontColor('#4CAF50')
-                      .margin({ left: 4 })
+                    if (record.mode === 'object') {
+                      // Tag: 实物识别
+                      Text('实物识别')
+                        .fontSize(10)
+                        .fontColor('#667eea')
+                        .padding({ left: 8, right: 8, top: 2, bottom: 2 })
+                        .backgroundColor('#EEF2FF')
+                        .borderRadius(10)
+                    } else {
+                      Circle({ width: 6, height: 6 })
+                        .fill('#4CAF50')
+                      Text('已保存')
+                        .fontSize(10)
+                        .fontColor('#4CAF50')
+                        .margin({ left: 4 })
+                    }
                   }
                   .margin({ top: 8 })
                 }

@@ -11,6 +11,11 @@ export interface PhotoRecord {
   filePath: string;
   timestamp: number;
   thumbnail?: string;
+  // Optional recognition summary for display in list
+  mode?: 'object' | 'document';
+  labelEn?: string;
+  labelZh?: string;
+  confidence?: number;
 }
 
 export class PhotoManager {
@@ -144,6 +149,25 @@ export class PhotoManager {
 
   getPhotoRecords(): PhotoRecord[] {
     return this.photoRecords;
+  }
+
+  // Attach recognition info to a photo record found by filePath
+  attachRecognition(filePath: string, data: { mode: 'object' | 'document'; labelEn: string; labelZh?: string; confidence?: number }): boolean {
+    try {
+      const rec = this.photoRecords.find(r => r.filePath === filePath);
+      if (rec) {
+        rec.mode = data.mode;
+        rec.labelEn = data.labelEn;
+        rec.labelZh = data.labelZh;
+        rec.confidence = data.confidence;
+        this.savePhotoRecords();
+        return true;
+      }
+      return false;
+    } catch (err) {
+      console.error('attachRecognition failed:', err);
+      return false;
+    }
   }
 
   deletePhoto(photoId: string): boolean {
