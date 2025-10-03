@@ -18,6 +18,13 @@ export interface PhotoRecord {
   confidence?: number;
 }
 
+interface GeneratedTypeLiteralInterface_1 {
+  mode: 'object' | 'document';
+  labelEn: string;
+  labelZh?: string;
+  confidence?: number;
+}
+
 export class PhotoManager {
   private static instance: PhotoManager;
   private photoRecords: PhotoRecord[] = [];
@@ -29,6 +36,10 @@ export class PhotoManager {
 
   public setContext(context: common.UIAbilityContext): void {
     this.context = context;
+  }
+
+  public getContext(): common.UIAbilityContext | null {
+    return this.context;
   }
 
   public static getInstance(): PhotoManager {
@@ -152,7 +163,7 @@ export class PhotoManager {
   }
 
   // Attach recognition info to a photo record found by filePath
-  attachRecognition(filePath: string, data: { mode: 'object' | 'document'; labelEn: string; labelZh?: string; confidence?: number }): boolean {
+  attachRecognition(filePath: string, data: GeneratedTypeLiteralInterface_1): boolean {
     try {
       const rec = this.photoRecords.find(r => r.filePath === filePath);
       if (rec) {

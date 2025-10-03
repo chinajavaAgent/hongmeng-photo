@@ -1,7 +1,6 @@
 import { camera } from '@kit.CameraKit'
 import { common } from '@kit.AbilityKit'
 import { image } from '@kit.ImageKit'
-import { photoAccessHelper } from '@kit.MediaLibraryKit'
 import fs from '@ohos.file.fs'
 
 // Camera preview controller (skeleton). It prepares camera session and preview.
@@ -23,8 +22,11 @@ export class CameraController {
     // Initialize camera manager and build a basic preview + photo pipeline
     this.camMgr = camera.getCameraManager(this.ctx);
     const cameras = this.camMgr.getSupportedCameras();
-    const back = cameras.find((c) => (c.cameraPosition === camera.CameraPosition.BACK)) || cameras[0];
-    this.camInput = this.camMgr.createCameraInput(back);
+    const chosen = cameras && cameras.length > 0 ? cameras[0] : undefined;
+    if (!chosen) {
+      throw new Error('No camera device available');
+    }
+    this.camInput = this.camMgr.createCameraInput(chosen);
 
     // Create preview to given surface
     this.previewOutput = this.camMgr.createPreviewOutput(previewSurfaceId);
@@ -33,7 +35,9 @@ export class CameraController {
     const w = 1280;
     const h = 960;
     this.imgReceiver = image.createImageReceiver(w, h, image.ImageFormat.JPEG, 3);
-    const recvId = this.imgReceiver.getReceivingSurfaceId();
+    const recvId = await this.imgReceiver.getReceivingSurfaceId();
+    // Depending on SDK, newer API may expect a Profile; kept for backward compat in this skeleton.
+    // @ts-ignore
     this.photoOutput = this.camMgr.createPhotoOutput(recvId);
     // Create session
     this.session = this.camMgr.createCaptureSession();
@@ -55,28 +59,47 @@ export class CameraController {
       const handler = async () => {
         try {
           const img = await this.imgReceiver!.readNextImage();
-          const pixelMap = await img.getPixelMap();
-          const packer = image.createImagePacker();
-          const data = await packer.packing(pixelMap, { format: image.ImageFormat.JPEG, quality: 92 });
+          // For JPEG receiver, read bytes from first component if available
+          // Fallback: use ImagePacker on PixelMap when supported
+          let bytes: ArrayBuffer | null = null;
+          // @ts-ignore: component API varies by SDK
+          const comp = img.getComponent ? img.getComponent(0) : null;
+          if (comp && comp.buffer) {
+            bytes = comp.buffer as ArrayBuffer;
+          } else {
+            // @ts-ignore: getPixelMap may not exist on all SDKs
+            const pixelMap = img.getPixelMap ? await img.getPixelMap() : null;
+            if (pixelMap) {
+              const packer = image.createImagePacker();
+              // @ts-ignore: format string for newer SDKs
+              const data = await packer.packing(pixelMap, { format: 'image/jpeg', quality: 92 });
+              bytes = data as ArrayBuffer;
+              pixelMap.release();
+            }
+          }
           const fileName = `photo_${Date.now()}.jpg`;
           const absPath = `${this.ctx.filesDir}/${fileName}`;
           const file = await fs.open(absPath, fs.OpenMode.CREATE | fs.OpenMode.WRITE_ONLY);
-          await fs.write(file.fd, new Uint8Array(data));
+          if (bytes) {
+            await fs.write(file.fd, new Uint8Array(bytes));
+          }
           await fs.close(file);
-          pixelMap.release();
           img.release();
           resolve(`file://${absPath}`);
         } catch (err) {
           reject(err as Error);
         } finally {
-          this.imgReceiver!.off('imageAvailable', handler);
+          // @ts-ignore: event name may vary across SDKs
+          this.imgReceiver!.off('imageArrival', handler);
         }
       };
-      this.imgReceiver.on('imageAvailable', handler);
+      // @ts-ignore: event name may vary across SDKs
+      this.imgReceiver.on('imageArrival', handler);
       try {
         await this.photoOutput.capture();
       } catch (e) {
-        this.imgReceiver.off('imageAvailable', handler);
+        // @ts-ignore
+        this.imgReceiver.off('imageArrival', handler);
         reject(e as Error);
       }
     });

@@ -18,11 +18,13 @@ export default struct CameraCapture {
   @State usingBack: boolean = true;
 
   aboutToAppear() {
-    const ctx = (this.photoManager as any).context as common.UIAbilityContext; // context is set in EntryAbility
-    this.cam = new CameraController(ctx);
+    const ctx = this.photoManager.getContext();
+    if (ctx) {
+      this.cam = new CameraController(ctx as common.UIAbilityContext);
+    }
   }
 
-  private async onXLoad() {
+  private async onXLoad(): Promise<void> {
     if (!this.cam) { return; }
     const surfaceId = this.xController.getXComponentSurfaceId();
     try {
@@ -33,7 +35,7 @@ export default struct CameraCapture {
     }
   }
 
-  private async onCapture() {
+  private async onCapture(): Promise<void> {
     if (!this.cam) { return; }
     try {
       this.isCapturing = true;
@@ -49,7 +51,7 @@ export default struct CameraCapture {
     }
   }
 
-  aboutToDisappear() {
+  aboutToDisappear(): void {
     if (this.cam) {
       this.cam.release();
     }
@@ -69,9 +71,8 @@ export default struct CameraCapture {
       // Luxury frame for preview
       Stack() {
         Column() {
-          XComponent({ id: 'cameraPreview', type: XComponentType.SURFACE })
-            .controller(this.xController)
-            .onLoad(() => this.onXLoad())
+          XComponent({ id: 'cameraPreview', type: XComponentType.SURFACE, controller: this.xController })
+            .onLoad((): void => { this.onXLoad(); })
             .width('100%')
             .height('100%')
         }
