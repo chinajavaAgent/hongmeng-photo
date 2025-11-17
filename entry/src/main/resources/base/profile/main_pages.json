@@ -2,10 +2,9 @@
   "src": [
     "pages/Index",
     "pages/CameraCapture",
-    "pages/ObjectResult",
-    "pages/ErrorUpload",
-    "pages/WeakPoints",
     "pages/StudyCamera",
-    "pages/Practice"
+    "pages/WeakPoints",
+    "pages/Practice",
+    "pages/MyProfile"
   ]
 }

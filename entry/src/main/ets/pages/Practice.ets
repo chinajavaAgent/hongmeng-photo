@@ -1,5 +1,4 @@
 import router from '@ohos.router'
-// import { speechRecognizer } from '@kit.SpeechKit' // 暂时注释掉，SDK可能不支持
 
 interface Question {
   id: string;
@@ -15,12 +14,10 @@ interface Question {
 struct Practice {
   @State currentQuestionIndex: number = 0;
   @State userAnswer: string = '';
-  @State isRecording: boolean = false;
   @State showResult: boolean = false;
   @State isCorrect: boolean = false;
   @State questions: Question[] = [];
-  @State topic: string = '分数运算';
-  @State subject: string = '数学';
+  @State topic: string = '综合练习';
   @State score: number = 0;
   @State totalQuestions: number = 0;
   @State showFinalScore: boolean = false;
@@ -30,40 +27,12 @@ struct Practice {
     if (params?.topic) {
       this.topic = params.topic as string;
     }
-    if (params?.subject) {
-      this.subject = params.subject as string;
-    }
     this.loadQuestions();
   }
 
   loadQuestions() {
     // 根据主题生成练习题
-    if (this.topic === '分数运算') {
-      this.questions = [
-        {
-          id: '1',
-          question: '2/3 + 1/6 = ?',
-          correctAnswer: '5/6',
-          explanation: '通分后：4/6 + 1/6 = 5/6',
-          type: 'calculation'
-        },
-        {
-          id: '2',
-          question: '下面哪个分数最大？',
-          options: ['2/3', '3/4', '5/6', '1/2'],
-          correctAnswer: '5/6',
-          explanation: '通分比较：8/12, 9/12, 10/12, 6/12，所以5/6最大',
-          type: 'multiple_choice'
-        },
-        {
-          id: '3',
-          question: '1 - 2/5 = ?',
-          correctAnswer: '3/5',
-          explanation: '1 = 5/5，所以 5/5 - 2/5 = 3/5',
-          type: 'calculation'
-        }
-      ];
-    } else if (this.topic === '光的折射') {
+    if (this.topic === '光的折射') {
       this.questions = [
         {
           id: '1',
@@ -81,6 +50,43 @@ struct Practice {
           type: 'text_input'
         }
       ];
+    } else if (this.topic === '分数运算') {
+      this.questions = [
+        {
+          id: '1',
+          question: '2/3 + 1/6 = ?',
+          correctAnswer: '5/6',
+          explanation: '通分后：4/6 + 1/6 = 5/6',
+          type: 'calculation'
+        },
+        {
+          id: '2',
+          question: '下面哪个分数最大？',
+          options: ['2/3', '3/4', '5/6', '1/2'],
+          correctAnswer: '5/6',
+          explanation: '通分比较：8/12, 9/12, 10/12, 6/12，所以5/6最大',
+          type: 'multiple_choice'
+        }
+      ];
+    } else {
+      // 默认综合练习题
+      this.questions = [
+        {
+          id: '1',
+          question: '三角形内角和是多少度？',
+          options: ['180°', '360°', '90°', '270°'],
+          correctAnswer: '180°',
+          explanation: '任意三角形的内角和都是180度',
+          type: 'multiple_choice'
+        },
+        {
+          id: '2',
+          question: '水的化学式是什么？',
+          correctAnswer: 'H2O',
+          explanation: '水由两个氢原子和一个氧原子组成',
+          type: 'text_input'
+        }
+      ];
     }
     
     this.totalQuestions = this.questions.length;
@@ -88,31 +94,6 @@ struct Practice {
 
   getCurrentQuestion(): Question {
     return this.questions[this.currentQuestionIndex] || this.questions[0];
-  }
-
-  async startVoiceInput() {
-    this.isRecording = true;
-    try {
-      // 模拟语音识别
-      await new Promise<void>(resolve => setTimeout(resolve, 2000));
-      
-      // 模拟识别结果
-      const question = this.getCurrentQuestion();
-      if (question.type === 'calculation') {
-        this.userAnswer = question.correctAnswer; // 模拟正确答案
-      } else {
-        this.userAnswer = '测试答案';
-      }
-    } catch (error) {
-      console.error('Voice recognition error:', error);
-      this.userAnswer = '识别失败';
-    } finally {
-      this.isRecording = false;
-    }
-  }
-
-  stopVoiceInput() {
-    this.isRecording = false;
   }
 
   submitAnswer() {
@@ -156,7 +137,6 @@ struct Practice {
 
   @Builder QuestionDisplay() {
     Column() {
-      // 获取当前题目
       // 进度指示器
       Row() {
         Text(`${this.currentQuestionIndex + 1}/${this.totalQuestions}`)
@@ -209,7 +189,7 @@ struct Practice {
       } else {
         // 文本输入或计算题
         Column() {
-          TextInput({ placeholder: '请输入答案或使用语音输入' })
+          TextInput({ placeholder: '请输入答案' })
             .width('85%')
             .height(48)
             .fontSize(16)
@@ -217,31 +197,6 @@ struct Practice {
             .onChange((value: string) => {
               this.userAnswer = value;
             })
-
-          // 语音输入按钮
-          Row() {
-            Button(this.isRecording ? '录音中...' : '🎤 语音答题', { type: ButtonType.Capsule })
-              .width(140)
-              .height(40)
-              .fontSize(14)
-              .backgroundColor(this.isRecording ? '#FF6B6B' : '#4CAF50')
-              .onClick(() => {
-                if (this.isRecording) {
-                  this.stopVoiceInput();
-                } else {
-                  this.startVoiceInput();
-                }
-              })
-            
-            if (this.isRecording) {
-              LoadingProgress()
-                .width(24)
-                .height(24)
-                .color('#FFFFFF')
-                .margin({ left: 12 })
-            }
-          }
-          .margin({ top: 16 })
         }
         .width('100%')
         .margin({ bottom: 20 })
@@ -346,39 +301,6 @@ struct Practice {
           .fontColor('#4CAF50')
           .margin({ bottom: 30 })
 
-        Column() {
-          if (this.getAccuracy() >= 80) {
-            Text('🎉 表现优秀！')
-              .fontSize(16)
-              .fontColor('#4CAF50')
-              .margin({ bottom: 8 })
-            Text('您对该知识点掌握很好，继续保持！')
-              .fontSize(14)
-              .fontColor('#666')
-          } else if (this.getAccuracy() >= 60) {
-            Text('📚 还需努力')
-              .fontSize(16)
-              .fontColor('#FF9800')
-              .margin({ bottom: 8 })
-            Text('建议多练习相关题目，加强理解')
-              .fontSize(14)
-              .fontColor('#666')
-          } else {
-            Text('💪 需要加强')
-              .fontSize(16)
-              .fontColor('#F44336')
-              .margin({ bottom: 8 })
-            Text('该知识点需要重点复习，建议寻求帮助')
-              .fontSize(14)
-              .fontColor('#666')
-          }
-        }
-        .width('85%')
-        .padding(16)
-        .backgroundColor('#F8F9FA')
-        .borderRadius(12)
-        .margin({ bottom: 30 })
-
         Row() {
           Button('再练一次', { type: ButtonType.Capsule })
             .width('45%')
@@ -391,7 +313,7 @@ struct Practice {
           
           Blank()
           
-          Button('返回首页', { type: ButtonType.Capsule })
+          Button('返回', { type: ButtonType.Capsule })
             .width('45%')
             .height(44)
             .fontSize(14)
@@ -429,7 +351,7 @@ struct Practice {
             .fontSize(18)
             .fontWeight(FontWeight.Bold)
             .fontColor('#2C3E50')
-          Text(this.subject + ' 练习')
+          Text('练习')
             .fontSize(12)
             .fontColor('#888')
             .margin({ top: 2 })

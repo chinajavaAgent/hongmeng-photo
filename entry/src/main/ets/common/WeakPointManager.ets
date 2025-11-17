@@ -20,6 +20,13 @@ export interface StudySession {
   timestamp: number;
 }
 
+export interface StudyStatistics {
+  totalWeakPoints: number;
+  totalSessions: number;
+  totalPracticeTime: number;
+  averageAccuracy: number;
+}
+
 export class WeakPointManager {
   private static instance: WeakPointManager;
   private weakPoints: WeakPointRecord[] = [];
@@ -156,10 +163,10 @@ export class WeakPointManager {
 
   // 根据主题更新练习记录（当没有具体记录ID时）
   updatePracticeByTopic(topic: string, subject: string, score: number, totalQuestions: number): boolean {
-    const weakPoint = this.weakPoints.find(point => 
-      point.topic === topic && point.subject === subject
+    const weakPoint = this.weakPoints.find(point =>
+    point.topic === topic && point.subject === subject
     );
-    
+
     if (weakPoint) {
       return this.updatePracticeRecord(weakPoint.id, score, totalQuestions);
     } else {
@@ -184,10 +191,10 @@ export class WeakPointManager {
 
     this.studySessions.unshift(newSession);
     this.saveData();
-    
+
     // 同时更新薄弱点记录
     this.updatePracticeByTopic(topic, subject, score, totalQuestions);
-    
+
     return id;
   }
 
@@ -197,11 +204,11 @@ export class WeakPointManager {
   }
 
   // 获取学习统计
-  getStudyStatistics() {
+  getStudyStatistics(): StudyStatistics {
     const totalWeakPoints = this.weakPoints.length;
     const totalSessions = this.studySessions.length;
     const totalPracticeTime = this.studySessions.reduce((sum, session) => sum + session.duration, 0);
-    const averageAccuracy = this.weakPoints.length > 0 
+    const averageAccuracy = this.weakPoints.length > 0
       ? Math.round(this.weakPoints.reduce((sum, point) => sum + point.correctRate, 0) / this.weakPoints.length)
       : 0;
 
@@ -215,7 +222,9 @@ export class WeakPointManager {
 
   // 获取连续学习天数
   getStudyStreak(): number {
-    if (this.studySessions.length === 0) return 0;
+    if (this.studySessions.length === 0) {
+      return 0;
+    }
 
     const today = new Date();
     const msPerDay = 24 * 60 * 60 * 1000;
@@ -226,7 +235,7 @@ export class WeakPointManager {
     this.studySessions.forEach(session => {
       const sessionDate = new Date(session.timestamp);
       const dateKey = sessionDate.toDateString();
-      
+
       if (!sessionsByDate.has(dateKey)) {
         sessionsByDate.set(dateKey, []);
       }
@@ -253,12 +262,33 @@ export class WeakPointManager {
     const date = new Date(timestamp);
     const now = new Date();
     const diffInHours = (now.getTime() - timestamp) / (1000 * 60 * 60);
-    
+
     if (diffInHours < 24) {
       return Math.floor(diffInHours) + '小时前';
     } else {
       const diffInDays = Math.floor(diffInHours / 24);
       return diffInDays + '天前';
     }
+  }
+
+  // 获取薄弱点数量（用于Tab显示）
+  getWeakPointsCount(): number {
+    return this.weakPoints.length;
+  }
+
+  // 获取总练习次数（用于Tab显示）
+  getTotalPracticeCount(): number {
+    return this.weakPoints.reduce((sum, point) => sum + point.totalAttempts, 0);
+  }
+
+  // 获取平均正确率（用于Tab显示）
+  getAverageAccuracy(): string {
+    if (this.weakPoints.length === 0) {
+      return '0%';
+    }
+    const avgRate = Math.round(
+      this.weakPoints.reduce((sum, point) => sum + point.correctRate, 0) / this.weakPoints.length
+    );
+    return avgRate + '%';
   }
 }

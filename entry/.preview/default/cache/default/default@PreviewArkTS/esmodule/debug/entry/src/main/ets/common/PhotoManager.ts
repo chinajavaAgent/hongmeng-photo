@@ -8,6 +8,17 @@ export interface PhotoRecord {
     filePath: string;
     timestamp: number;
     thumbnail?: string;
+    // Optional recognition summary for display in list
+    mode?: 'object' | 'document';
+    labelEn?: string;
+    labelZh?: string;
+    confidence?: number;
+}
+interface GeneratedTypeLiteralInterface_1 {
+    mode: 'object' | 'document';
+    labelEn: string;
+    labelZh?: string;
+    confidence?: number;
 }
 export class PhotoManager {
     private static instance: PhotoManager;
@@ -18,6 +29,9 @@ export class PhotoManager {
     }
     public setContext(context: common.UIAbilityContext): void {
         this.context = context;
+    }
+    public getContext(): common.UIAbilityContext | null {
+        return this.context;
     }
     public static getInstance(): PhotoManager {
         if (!PhotoManager.instance) {
@@ -34,7 +48,8 @@ export class PhotoManager {
             const atManager = abilityAccessCtrl.createAtManager();
             const permissions: Array<Permissions> = [
                 'ohos.permission.CAMERA',
-                'ohos.permission.WRITE_MEDIA'
+                'ohos.permission.WRITE_MEDIA',
+                'ohos.permission.READ_MEDIA'
             ];
             const requestResult: PermissionRequestResult = await atManager.requestPermissionsFromUser(this.context, permissions);
             // 检查所有权限是否都被授予
@@ -121,6 +136,25 @@ export class PhotoManager {
     getPhotoRecords(): PhotoRecord[] {
         return this.photoRecords;
     }
+    // Attach recognition info to a photo record found by filePath
+    attachRecognition(filePath: string, data: GeneratedTypeLiteralInterface_1): boolean {
+        try {
+            const rec = this.photoRecords.find(r => r.filePath === filePath);
+            if (rec) {
+                rec.mode = data.mode;
+                rec.labelEn = data.labelEn;
+                rec.labelZh = data.labelZh;
+                rec.confidence = data.confidence;
+                this.savePhotoRecords();
+                return true;
+            }
+            return false;
+        }
+        catch (err) {
+            console.error('attachRecognition failed:', err);
+            return false;
+        }
+    }
     deletePhoto(photoId: string): boolean {
         try {
             const index = this.photoRecords.findIndex(record => record.id === photoId);
@@ -135,6 +169,18 @@ export class PhotoManager {
             console.error('Delete photo failed:', error);
             return false;
         }
+    }
+    // Public helper to add a new record by file path (used by camera capture flow)
+    public addRecord(filePath: string): PhotoRecord {
+        const rec: PhotoRecord = {
+            id: `photo_${Date.now()}`,
+            filePath,
+            timestamp: Date.now(),
+            thumbnail: filePath
+        };
+        this.photoRecords.unshift(rec);
+        this.savePhotoRecords();
+        return rec;
     }
     private loadPhotoRecords(): void {
         try {

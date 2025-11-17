@@ -3,6 +3,7 @@ string EntryAbility_label 0x01000007
 string app_name 0x01000001
 string camera_permission_reason 0x0100000a
 string module_desc 0x01000008
+string read_media_permission_reason 0x0100000c
 string write_media_permission_reason 0x0100000b
 color start_window_background 0x01000009
 media app_icon 0x01000005

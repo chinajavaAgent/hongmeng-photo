@@ -47,5 +47,9 @@
 			"type":	"string",
 			"name":	"write_media_permission_reason",
 			"id":	"0x0100000B"
+		}, {
+			"type":	"string",
+			"name":	"read_media_permission_reason",
+			"id":	"0x0100000C"
 		}]
 }
