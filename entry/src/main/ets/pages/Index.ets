@@ -74,30 +74,13 @@ struct Index {
 
         // 图标
         Image(this.selectedTabIndex === targetIndex ? selectedIcon : normalIcon)
-          .width(24)
-          .height(24)
+          .width(30)
+          .height(30)
           .objectFit(ImageFit.Contain)
           .animation({
             duration: 250,
             curve: Curve.EaseInOut
           })
-
-        // 活跃指示点
-        if (this.selectedTabIndex === targetIndex) {
-          Column() {
-          }
-          .width(6)
-          .height(6)
-          .borderRadius(3)
-          .backgroundColor('#667eea')
-          .position({ x: 19, y: 34 })
-          .shadow({
-            radius: 3,
-            color: '#667eea',
-            offsetX: 0,
-            offsetY: 0
-          })
-        }
       }
       .width(44)
       .height(44)
@@ -117,7 +100,6 @@ struct Index {
     .width('100%')
     .height(70)
     .justifyContent(FlexAlign.Center)
-    .backgroundColor(this.selectedTabIndex === targetIndex ? '#F8F9FF' : '#FFFFFF')
     .borderRadius(16)
     .margin({
       left: 3,
@@ -126,12 +108,6 @@ struct Index {
       bottom: 6
     })
     .scale({ x: this.selectedTabIndex === targetIndex ? 1.05 : 1, y: this.selectedTabIndex === targetIndex ? 1.05 : 1 })
-    .shadow({
-      radius: this.selectedTabIndex === targetIndex ? 8 : 2,
-      color: this.selectedTabIndex === targetIndex ? '#20000000' : '#10000000',
-      offsetX: 0,
-      offsetY: this.selectedTabIndex === targetIndex ? 4 : 1
-    })
     .onClick(() => {
       this.selectedTabIndex = targetIndex
     })
@@ -443,13 +419,13 @@ struct Index {
     Column() {
       // 顶部标题栏
       Row() {
-        Text('👤 我的')
+        Text('我的')
           .fontSize(24)
           .fontWeight(FontWeight.Bold)
           .fontColor('#2C3E50')
         Blank()
         Button() {
-          Image($r('app.media.phone'))
+          Image($r('app.media.person'))
             .width(20)
             .height(20)
             .fillColor('#FFFFFF')
@@ -716,22 +692,22 @@ struct Index {
         TabContent() {
           this.StudyCameraTab()
         }
-        .tabBar(this.TabBuilder('拍照学习', 0, $r('app.media.phone'), $r('app.media.phone_select')))
+        .tabBar(this.TabBuilder('拍照学习', 0, $r('app.media.home_phone'), $r('app.media.home_phone')))
 
         TabContent() {
           this.WeakPointsTab()
         }
-        .tabBar(this.TabBuilder('薄弱记录', 1, $r('app.media.record'), $r('app.media.record_select')))
+        .tabBar(this.TabBuilder('错题记录', 1, $r('app.media.record'), $r('app.media.record')))
 
         TabContent() {
           this.PracticeTab()
         }
-        .tabBar(this.TabBuilder('练习', 2, $r('app.media.lianxi'), $r('app.media.lianxi_select')))
+        .tabBar(this.TabBuilder('练习', 2, $r('app.media.write'), $r('app.media.write')))
 
         TabContent() {
           this.MyProfileTab()
         }
-        .tabBar(this.TabBuilder('我的', 3, $r('app.media.my'), $r('app.media.my_selected')))
+        .tabBar(this.TabBuilder('我的', 3, $r('app.media.person'), $r('app.media.person')))
       }
       .animationDuration(300)
       .backgroundColor('#F8F9FA')
