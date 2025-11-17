@@ -6,7 +6,8 @@
       "Bash(cp:*)",
       "Bash(find:*)",
       "Bash(hvigor build:*)",
-      "Bash(./hvigorw:*)"
+      "Bash(./hvigorw:*)",
+      "Bash(hvigor assembleHap:*)"
     ],
     "deny": []
   }

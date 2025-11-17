@@ -12,6 +12,8 @@ struct Index {
   @State selectedTabIndex: number = 0;
   @State photoRecords: PhotoRecord[] = [];
   @State isTakingPhoto: boolean = false;
+  @State weakPointsCount: number = 3;
+  @State studyStreak: number = 7;
   private photoManager: PhotoManager = PhotoManager.getInstance();
   private recognitionService: RecognitionService = new MockRecognitionService();
 
@@ -375,10 +377,250 @@ struct Index {
   }
 
   @Builder HomeContent() {
-    Column() {
-      this.PhotoCaptureArea()
-      Blank()
-      this.CameraGuideSection()
+    Scroll() {
+      Column() {
+        // 欢迎区域
+        Column() {
+          Row() {
+            Text('📚')
+              .fontSize(32)
+            Column() {
+              Text('错题学习助手')
+                .fontSize(24)
+                .fontWeight(FontWeight.Bold)
+                .fontColor('#2C3E50')
+                .alignSelf(ItemAlign.Start)
+              Text('智能识别薄弱点，个性化练习')
+                .fontSize(14)
+                .fontColor('#888')
+                .margin({ top: 4 })
+                .alignSelf(ItemAlign.Start)
+            }
+            .alignItems(HorizontalAlign.Start)
+            .margin({ left: 16 })
+            .layoutWeight(1)
+          }
+          .width('100%')
+          .alignItems(VerticalAlign.Top)
+        }
+        .width('90%')
+        .padding(20)
+        .backgroundColor('#FFFFFF')
+        .borderRadius(16)
+        .shadow({
+          radius: 12,
+          color: '#20000000',
+          offsetX: 0,
+          offsetY: 6
+        })
+        .margin({ top: 20, bottom: 20 })
+
+        // 统计卡片
+        Row() {
+          Column() {
+            Text(this.weakPointsCount.toString())
+              .fontSize(28)
+              .fontWeight(FontWeight.Bold)
+              .fontColor('#FF6B6B')
+            Text('薄弱知识点')
+              .fontSize(12)
+              .fontColor('#888')
+              .margin({ top: 4 })
+          }
+          .width('48%')
+          .height(100)
+          .justifyContent(FlexAlign.Center)
+          .backgroundColor('#FFFFFF')
+          .borderRadius(12)
+          .shadow({
+            radius: 8,
+            color: '#15000000',
+            offsetX: 0,
+            offsetY: 4
+          })
+
+          Blank()
+
+          Column() {
+            Text(this.studyStreak.toString())
+              .fontSize(28)
+              .fontWeight(FontWeight.Bold)
+              .fontColor('#4CAF50')
+            Text('连续学习天数')
+              .fontSize(12)
+              .fontColor('#888')
+              .margin({ top: 4 })
+          }
+          .width('48%')
+          .height(100)
+          .justifyContent(FlexAlign.Center)
+          .backgroundColor('#FFFFFF')
+          .borderRadius(12)
+          .shadow({
+            radius: 8,
+            color: '#15000000',
+            offsetX: 0,
+            offsetY: 4
+          })
+        }
+        .width('90%')
+        .margin({ bottom: 30 })
+
+        // 功能按钮区域
+        Column() {
+          Text('📖 学习功能')
+            .fontSize(18)
+            .fontWeight(FontWeight.Bold)
+            .fontColor('#2C3E50')
+            .alignSelf(ItemAlign.Start)
+            .margin({ bottom: 20 })
+
+          // 错题上传
+          Row() {
+            Stack() {
+              Circle({ width: 60, height: 60 })
+                .fill('#FF6B6B')
+              Text('📷')
+                .fontSize(24)
+                .fontColor('#FFFFFF')
+            }
+            .margin({ right: 16 })
+
+            Column() {
+              Text('错题上传')
+                .fontSize(18)
+                .fontWeight(FontWeight.Medium)
+                .fontColor('#2C3E50')
+                .alignSelf(ItemAlign.Start)
+              Text('拍照识别错题，建立薄弱点档案')
+                .fontSize(13)
+                .fontColor('#888')
+                .margin({ top: 4 })
+                .alignSelf(ItemAlign.Start)
+            }
+            .alignItems(HorizontalAlign.Start)
+            .layoutWeight(1)
+
+            Image($r('sys.media.ohos_ic_public_arrow_right'))
+              .width(20)
+              .height(20)
+              .fillColor('#CCC')
+          }
+          .width('100%')
+          .height(80)
+          .padding(16)
+          .backgroundColor('#FFFFFF')
+          .borderRadius(12)
+          .shadow({
+            radius: 8,
+            color: '#15000000',
+            offsetX: 0,
+            offsetY: 4
+          })
+          .margin({ bottom: 12 })
+          .onClick(() => {
+            router.pushUrl({ url: 'pages/ErrorUpload' });
+          })
+
+          // 拍照学习
+          Row() {
+            Stack() {
+              Circle({ width: 60, height: 60 })
+                .fill('#1698CE')
+              Text('📸')
+                .fontSize(24)
+                .fontColor('#FFFFFF')
+            }
+            .margin({ right: 16 })
+
+            Column() {
+              Text('拍照学习')
+                .fontSize(18)
+                .fontWeight(FontWeight.Medium)
+                .fontColor('#2C3E50')
+                .alignSelf(ItemAlign.Start)
+              Text('识别学习内容，智能推荐相关练习')
+                .fontSize(13)
+                .fontColor('#888')
+                .margin({ top: 4 })
+                .alignSelf(ItemAlign.Start)
+            }
+            .alignItems(HorizontalAlign.Start)
+            .layoutWeight(1)
+
+            Image($r('sys.media.ohos_ic_public_arrow_right'))
+              .width(20)
+              .height(20)
+              .fillColor('#CCC')
+          }
+          .width('100%')
+          .height(80)
+          .padding(16)
+          .backgroundColor('#FFFFFF')
+          .borderRadius(12)
+          .shadow({
+            radius: 8,
+            color: '#15000000',
+            offsetX: 0,
+            offsetY: 4
+          })
+          .margin({ bottom: 12 })
+          .onClick(() => {
+            router.pushUrl({ url: 'pages/StudyCamera' });
+          })
+
+          // 薄弱点管理
+          Row() {
+            Stack() {
+              Circle({ width: 60, height: 60 })
+                .fill('#667eea')
+              Text('📊')
+                .fontSize(24)
+                .fontColor('#FFFFFF')
+            }
+            .margin({ right: 16 })
+
+            Column() {
+              Text('薄弱点管理')
+                .fontSize(18)
+                .fontWeight(FontWeight.Medium)
+                .fontColor('#2C3E50')
+                .alignSelf(ItemAlign.Start)
+              Text('查看错题记录，跟踪学习进度')
+                .fontSize(13)
+                .fontColor('#888')
+                .margin({ top: 4 })
+                .alignSelf(ItemAlign.Start)
+            }
+            .alignItems(HorizontalAlign.Start)
+            .layoutWeight(1)
+
+            Image($r('sys.media.ohos_ic_public_arrow_right'))
+              .width(20)
+              .height(20)
+              .fillColor('#CCC')
+          }
+          .width('100%')
+          .height(80)
+          .padding(16)
+          .backgroundColor('#FFFFFF')
+          .borderRadius(12)
+          .shadow({
+            radius: 8,
+            color: '#15000000',
+            offsetX: 0,
+            offsetY: 4
+          })
+          .onClick(() => {
+            router.pushUrl({ url: 'pages/WeakPoints' });
+          })
+        }
+        .width('90%')
+        .alignItems(HorizontalAlign.Start)
+      }
+      .width('100%')
+      .alignItems(HorizontalAlign.Center)
+      .padding({ bottom: 30 })
     }
     .width('100%')
     .height('100%')
@@ -544,13 +786,13 @@ struct Index {
         TabContent() {
           this.HomeContent()
         }
-        .tabBar(this.TabBuilder('首页', 0, $r('sys.media.wifi_router_fill'), $r('sys.media.save_button_picture')))
+        .tabBar(this.TabBuilder('学习', 0, $r('sys.media.wifi_router_fill'), $r('sys.media.save_button_picture')))
         .backgroundColor('#f8f9fa')
 
         TabContent() {
           this.MyContent()
         }
-        .tabBar(this.TabBuilder('我的', 1, $r('sys.media.thermometer_fill'), $r('sys.media.safe_volume_notification_icon')))
+        .tabBar(this.TabBuilder('记录', 1, $r('sys.media.thermometer_fill'), $r('sys.media.safe_volume_notification_icon')))
         .backgroundColor('#f8f9fa')
       }
       .animationDuration(300)
