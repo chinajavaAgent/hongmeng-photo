@@ -122,23 +122,13 @@ struct Index {
     Column() {
       // 顶部标题栏
       Row() {
-        Text('📷 拍照学习')
+        Image($r('app.media.home_phone'))
+          .width(32)
+        Text('拍照学习')
           .fontSize(24)
           .fontWeight(FontWeight.Bold)
           .fontColor('#2C3E50')
         Blank()
-        Button() {
-          Text('📷')
-            .fontSize(20)
-            .fontColor('#FFFFFF')
-        }
-        .type(ButtonType.Circle)
-        .width(48)
-        .height(48)
-        .backgroundColor('#667eea')
-        .onClick(() => {
-          router.pushUrl({ url: 'pages/CameraCapture' })
-        })
       }
       .width('90%')
       .padding({ top: 20, bottom: 20 })
